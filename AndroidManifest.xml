@@ -1,0 +1,124 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Essential permissions for alarm and notification functionality -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/> <!-- Required for Android 13+ -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/> <!-- Required for exact alarm scheduling -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/> <!-- Required for Android 12+ -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/> <!-- For overlay notifications -->
+
+    <!-- Database and storage permissions -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!-- Network permissions (if needed for future updates) -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <application
+        android:label="Transition Curriculum"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true"
+        android:requestLegacyExternalStorage="true">
+
+        <!-- Alarm service metadata -->
+        <meta-data
+            android:name="com.dexterous.flutterlocalnotifications.NOTIFICATION_DETAILS"
+            android:value="true" />
+
+        <!-- Default notification icon -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+
+        <!-- Boot completed receiver for persistent alarms -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+                <data android:scheme="package"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Receiver for handling notification actions -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Main activity configuration -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true">
+
+            <!-- Theme metadata -->
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+
+            <!-- Main launcher intent -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <!-- Handle notification taps -->
+            <intent-filter>
+                <action android:name="FLUTTER_NOTIFICATION_CLICK"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <!-- Flutter embedding metadata -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+
+        <!-- Background task configuration -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="true" />
+    </application>
+
+    <!-- Queries for Android 11+ package visibility -->
+    <queries>
+        <!-- Intent to handle text processing -->
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+
+        <!-- Intent to handle alarm/notification settings -->
+        <intent>
+            <action android:name="android.settings.APP_NOTIFICATION_SETTINGS"/>
+        </intent>
+
+        <!-- Intent to handle battery optimization settings -->
+        <intent>
+            <action android:name="android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+        </intent>
+
+        <!-- Intent to handle external file access -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:mimeType="application/pdf"/>
+        </intent>
+    </queries>
+</manifest>
